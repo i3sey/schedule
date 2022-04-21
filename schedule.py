@@ -89,7 +89,7 @@ class ScheduleMod(loader.Module):
         self._db.set("Schedule", "setup", self.sh)
         
     @loader.unrestricted
-    async def schedulecmd(self, message: Message) -> None:
+    async def tscmd(self, message: Message) -> None:
         strings = []
         for key,item in self.sh.items():
             strings.append("{}: {}".format(str(key).capitalize(), item))
