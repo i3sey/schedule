@@ -1,17 +1,17 @@
-# ██ ██████  ███████ ███████ ██    ██ 
-# ██      ██ ██      ██       ██  ██  
-# ██  █████  ███████ █████     ████   
-# ██      ██      ██ ██         ██    
-# ██ ██████  ███████ ███████    ██    
-# Licensed under the GNU aGPLv3
-# https://www.gnu.org/licenses/agpl-3.0.html
-
+"""
+██ ██████  ███████ ███████ ██    ██ 
+██      ██ ██      ██       ██  ██  
+██  █████  ███████ █████     ████   
+██      ██      ██ ██         ██    
+██ ██████  ███████ ███████    ██    
+Licensed under the GNU aGPLv3
+https://www.gnu.org/licenses/agpl-3.0.html
+"""
 # requires: pytz
-
-import asyncio
 import re
-from datetime import datetime
-from random import randint
+
+from datetime import datetime, timedelta
+from email.mime import message
 
 import pytz
 from telethon.tl.types import Message
@@ -38,7 +38,73 @@ class ScheduleMod(loader.Module):
         self.ts = self._db.get("Schedule", "shift", {})
         self.sh = self._db.get("Schedule", "setup", {})
         #self.sh = {}
+        
+    
+    async def days_schedule(self):
+        """Storage to schedule
 
+        Returns:
+            dict: schedule of currect day
+        """
+        if datetime.isoweekday(datetime.now(pytz.timezone(self.ts.get('shift')))) == 3:
+            sche = {'1': '08:30–09:10',
+                    '2': '09:20–10:00',
+                    '3': '10:15–10:55',
+                    '4': '11:15–11:55',
+                    '5': '12:15–12:55',
+                    '6': '13:05–13:45',
+                    '7': '13:55–14:35'
+                    }
+            return sche
+        else:
+            sche = {'1': '08:00–08:40',
+                    '2': '08:50–09:30',
+                    '3': '09:45–10:25',
+                    '4': '10:45–11:25',
+                    '5': '11:45–12:25',
+                    '6': '12:35–13:15',
+                    '7': '13:25–14:05'
+                    }
+            return sche
+    
+    async def sort_time(self, delta_times):
+        """converts dict into list and sort it.
+
+        Args:
+            timeRem (dict): number of lesson : delta of times
+
+        Returns:
+            list: sorted list
+        """
+        deltas_list = []
+        temp_list = list(delta_times.items())
+        for val in temp_list:
+            deltas_list.append((val[0], val[1].seconds))
+        deltas_list.sort(key=lambda i: i[1])
+        return deltas_list
+    
+    async def str_timing(self, sche_dict):
+        """Find delta of currect time and times from dict
+
+        Args:
+            ScheDict (dict): dict with schedule
+            utczone (pytz.timezone()): timezone
+
+        Returns:
+            dict: number of lesson : delta of times
+        """
+        time_delta = {}
+        for i in sche_dict.items():
+            now = datetime.now(pytz.timezone(self.ts.get('shift'))).time()
+            from_sche = datetime.strptime(i[1], "%H:%M")
+            delta_1 = timedelta(hours=now.hour,
+                                minutes=now.minute,
+                                seconds=now.second)
+            delta_2 = timedelta(hours=from_sche.hour,
+                                minutes=from_sche.minute,
+                                seconds=from_sche.second)
+            time_delta[i[0]] = (delta_2-delta_1)
+        return time_delta
     
     async def shiftcmd(self, message: Message) -> None:
         """Смещение UTC в форме Часть света/Город (например Asia/Yekaterinburg)."""
@@ -91,9 +157,26 @@ class ScheduleMod(loader.Module):
     @loader.unrestricted
     async def tscmd(self, message: Message) -> None:
         strings = []
-        for key,item in self.sh.items():
+        items = await self.days_schedule()
+        for key,item in items.items():
             strings.append("{}: {}".format(str(key).capitalize(), item))
         result = "\n".join(strings)
         await utils.answer(message, result)
+        
+    @loader.unrestricted
+    async def tlcmd(self, message: Message) -> None:
+        lessonStarts = {}
+        lessonsEnds = {}
+        temp = await self.days_schedule()
+        for key, value in temp.items():
+            lessonStarts[key] = value.split('–', maxsplit=1)[0]
+            lessonsEnds[key] = value.split('–')[1]
+        start = await self.sort_time(await self.str_timing(lessonStarts))
+        end = await self.sort_time(await self.str_timing(lessonsEnds))
+        if start[1][1] < end[1][1]: 
+            answer = f'До начала {start[0][0]} урока: {datetime.strftime(datetime.fromtimestamp(start[1][1]), "%H:%M:%S")}\nУрок начнётся в {str(lessonStarts[start[0][0]])}'
+        else:
+            answer = f'До конца {end[0][0]} урока: {datetime.strftime(datetime.fromtimestamp(end[1][1]), "%H:%M:%S")}\nУрок начнётся в {str(lessonsEnds[end[0][0]])}'
+        await utils.answer(message, answer)
         
         
