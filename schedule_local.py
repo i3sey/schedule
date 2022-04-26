@@ -94,12 +94,13 @@ for key, value in days_schedule().items():
 
 start = sort_time(str_timing(lessonStarts, TimeZone))
 end = sort_time(str_timing(lessonsEnds, TimeZone))
-
-print(f'До начала {start[0][0]} урока: \
+if start[1][1] < end[1][1]: 
+            print(f'До начала {start[0][0]} урока: \
 {datetime.strftime(datetime.fromtimestamp(start[1][1]), "%H:%M:%S")}, \
 урок начнётся в \
 {str(lessonStarts[start[0][0]])}')
-print(f'До конца {end[0][0]} урока: \
+else:
+    print(f'До конца {end[0][0]} урока: \
 {datetime.strftime(datetime.fromtimestamp(end[1][1]), "%H:%M:%S")}, \
 урок закончится в \
 {str(lessonsEnds[end[0][0]])}')
