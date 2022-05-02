@@ -156,6 +156,7 @@ class ScheduleMod(loader.Module):
         
     @loader.unrestricted
     async def tscmd(self, message: Message) -> None:
+        """Текущее расписание на день"""
         strings = []
         items = await self.days_schedule()
         for key,item in items.items():
@@ -165,6 +166,7 @@ class ScheduleMod(loader.Module):
         
     @loader.unrestricted
     async def tlcmd(self, message: Message) -> None:
+        """Конец/Начало близжайшего урока"""
         lessonStarts = {}
         lessonsEnds = {}
         temp = await self.days_schedule()
