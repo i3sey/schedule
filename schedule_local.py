@@ -91,16 +91,15 @@ def str_timing(sche_dict, utczone):
 for key, value in days_schedule().items():
     lessonStarts[key] = value.split('–', maxsplit=1)[0]
     lessonsEnds[key] = value.split('–')[1]
-
 start = sort_time(str_timing(lessonStarts, TimeZone))
 end = sort_time(str_timing(lessonsEnds, TimeZone))
 if start[1][1] < end[1][1]: 
             print(f'До начала {start[0][0]} урока: \
-{datetime.strftime(datetime.fromtimestamp(start[1][1]), "%H:%M:%S")}, \
+{datetime.strftime(datetime.utcfromtimestamp(start[0][1]), "%H:%M:%S")}, \
 урок начнётся в \
 {str(lessonStarts[start[0][0]])}')
 else:
     print(f'До конца {end[0][0]} урока: \
-{datetime.strftime(datetime.fromtimestamp(end[1][1]), "%H:%M:%S")}, \
+{datetime.strftime(datetime.utcfromtimestamp(end[0][1]), "%H:%M:%S")}, \
 урок закончится в \
 {str(lessonsEnds[end[0][0]])}')
