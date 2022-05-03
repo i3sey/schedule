@@ -176,9 +176,9 @@ class ScheduleMod(loader.Module):
         start = await self.sort_time(await self.str_timing(lessonStarts))
         end = await self.sort_time(await self.str_timing(lessonsEnds))
         if start[1][1] < end[1][1]:
-            answer = f'До начала {start[0][0]} урока: <code>{datetime.strftime(datetime.fromtimestamp(start[1][1]), "%H:%M:%S")}</code>\nУрок начнётся в <code>{str(lessonStarts[start[0][0]])}:00</code>'
+            answer = f'До начала {start[0][0]} урока: <code>{datetime.strftime(datetime.utcfromtimestamp(start[0][1]), "%H:%M:%S")}</code>\nУрок начнётся в <code>{str(lessonStarts[start[0][0]])}:00</code>'
         else:
-            answer = f'До конца {end[0][0]} урока: <code>{datetime.strftime(datetime.fromtimestamp(end[1][1]), "%H:%M:%S")}</code>\nУрок закончится в: <code>{str(lessonsEnds[end[0][0]])}:00</code>'
+            answer = f'До конца {end[0][0]} урока: <code>{datetime.strftime(datetime.utcfromtimestamp(end[0][1]), "%H:%M:%S")}</code>\nУрок закончится в: <code>{str(lessonsEnds[end[0][0]])}:00</code>'
         await utils.answer(message, answer)
         
         
