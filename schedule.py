@@ -46,7 +46,8 @@ class ScheduleMod(loader.Module):
         Returns:
             dict: schedule of currect day
         """
-        if datetime.isoweekday(datetime.now(pytz.timezone(self.ts.get('shift')))) == 1:
+        day = datetime.isoweekday(datetime.now(pytz.timezone(self.ts.get('shift'))))
+        if day == 1 or day == 6 or day == 7:
             sche = {'1': '08:35–09:15',
                     '2': '09:25–10:05',
                     '3': '10:20–11:00',
