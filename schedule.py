@@ -46,14 +46,15 @@ class ScheduleMod(loader.Module):
         Returns:
             dict: schedule of currect day
         """
-        if datetime.isoweekday(datetime.now(pytz.timezone(self.ts.get('shift')))) == 3:
-            sche = {'1': '08:30–09:10',
-                    '2': '09:20–10:00',
-                    '3': '10:15–10:55',
-                    '4': '11:15–11:55',
-                    '5': '12:15–12:55',
-                    '6': '13:05–13:45',
-                    '7': '13:55–14:35'
+        if datetime.isoweekday(datetime.now(pytz.timezone(self.ts.get('shift')))) == 1:
+            sche = {'1': '08:35–09:15',
+                    '2': '09:25–10:05',
+                    '3': '10:20–11:00',
+                    '4': '11:20–12:00',
+                    '5': '12:20–13:00',
+                    '6': '13:10–13:50',
+                    '7': '14:00–14:40',
+                    '8': '14:50-15:30'
                     }
             return sche
         else:
@@ -63,7 +64,8 @@ class ScheduleMod(loader.Module):
                     '4': '10:45–11:25',
                     '5': '11:45–12:25',
                     '6': '12:35–13:15',
-                    '7': '13:25–14:05'
+                    '7': '13:25–14:05',
+                    '8': '14:15-14:55'
                     }
             return sche
     
